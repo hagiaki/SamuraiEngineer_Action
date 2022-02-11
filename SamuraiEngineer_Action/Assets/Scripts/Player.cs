@@ -5,12 +5,15 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public float speed = 5.0f;
-    private Vector3 PlayerPos;
     Animator PlayerAnimator;
+    private Rigidbody rb;
+    private float distance = 1.0f;
+    //private bool isGrounded = false;
     // Start is called before the first frame update
     void Start()
     {
-        //PlayerPos = GetComponent<Transform>().position;
+        rb = GetComponent<Rigidbody>();
+        //rb.constraints = RigidbodyConstraints.FreezeRotation;
         PlayerAnimator = GetComponent<Animator>();
     }
 
@@ -18,7 +21,15 @@ public class Player : MonoBehaviour
     void Update()
     {
         Vector3 moveDirection = new Vector3(0, 0, 0);
+        Vector3 rayPosition = transform.position + new Vector3(0.0f, 0.8f, 0.0f);
+        Ray ray = new Ray(rayPosition, Vector3.down);
+        bool isGround = Physics.Raycast(ray, distance);
+        Debug.DrawRay(rayPosition, Vector3.down * distance, Color.red);
         //Vector3 forwardDirection = transform.forward;
+
+        //isGrounded = Physics.Raycast(gameObject.transform.position + 0.1f * gameObject.transform.up, -gameObject.transform.up, 0.15f);
+        //Debug.DrawRay(gameObject.transform.position + 0.1f * gameObject.transform.up, -0.15f * gameObject.transform.up, Color.blue);
+
         if (Input.GetKey(KeyCode.UpArrow))
         {
             moveDirection.z = 1;
@@ -35,7 +46,13 @@ public class Player : MonoBehaviour
         {
             moveDirection.x = -1;
         }
-        if()
+        if (Input.GetKeyDown(KeyCode.Space) && isGround==true)
+        {
+            rb.AddForce(new Vector3(0, 300, 0));
+            PlayerAnimator.SetBool("RUNNING", false);
+            PlayerAnimator.SetTrigger("JUMP");
+        }
+
         moveDirection.Normalize();//ê≥ãKâª
 
         //Vector3 rotateDirecton = transform.position - PlayerPos;
@@ -52,6 +69,6 @@ public class Player : MonoBehaviour
 
         moveDirection *= speed * Time.deltaTime;
         transform.position += moveDirection;
-
+        Debug.Log(isGround);
     }
 }
