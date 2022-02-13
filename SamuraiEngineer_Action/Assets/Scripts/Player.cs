@@ -8,6 +8,7 @@ public class Player : MonoBehaviour
     Animator PlayerAnimator;
     private Rigidbody rb;
     private float distance = 1.0f;
+    Vector3 jumpDirection = new Vector3(0, 0, 0);
     //private bool isGrounded = false;
     // Start is called before the first frame update
     void Start()
@@ -21,9 +22,13 @@ public class Player : MonoBehaviour
     void Update()
     {
         Vector3 moveDirection = new Vector3(0, 0, 0);
+
         Vector3 rayPosition = transform.position + new Vector3(0.0f, 0.8f, 0.0f);
+        RaycastHit hitinfo;
         Ray ray = new Ray(rayPosition, Vector3.down);
-        bool isGround = Physics.Raycast(ray, distance);
+        bool isGround = Physics.Raycast(ray, out hitinfo);
+        distance = hitinfo.distance;
+        transform.position = hitinfo.point;//ê⁄ínÇµÇƒÇ¢ÇÈä‘ÇÕYÇÃÇ›ÅB
         Debug.DrawRay(rayPosition, Vector3.down * distance, Color.red);
         //Vector3 forwardDirection = transform.forward;
 
@@ -48,12 +53,13 @@ public class Player : MonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Space) && isGround==true)
         {
-            rb.AddForce(new Vector3(0, 300, 0));
-            PlayerAnimator.SetBool("RUNNING", false);
+            //rb.AddForce(new Vector3(0, 300, 0));
+            jumpDirection = Vector3.up;
             PlayerAnimator.SetTrigger("JUMP");
         }
 
         moveDirection.Normalize();//ê≥ãKâª
+        jumpDirection.Normalize();
 
         //Vector3 rotateDirecton = transform.position - PlayerPos;
 
