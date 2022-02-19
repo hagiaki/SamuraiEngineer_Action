@@ -5,15 +5,14 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public float speed = 5.0f;
+    public float jump = 10.0f;
     Animator PlayerAnimator;
-    private Rigidbody rb;
-    private float distance = 1.0f;
-    Vector3 jumpDirection = new Vector3(0, 0, 0);
+    private float distance = 0.1f;
+    protected float gravity = 1.0f;
     //private bool isGrounded = false;
     // Start is called before the first frame update
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
         //rb.constraints = RigidbodyConstraints.FreezeRotation;
         PlayerAnimator = GetComponent<Animator>();
     }
@@ -22,8 +21,9 @@ public class Player : MonoBehaviour
     void Update()
     {
         Vector3 moveDirection = new Vector3(0, 0, 0);
+        Vector3 jumpDirection = new Vector3(0, 0, 0);
 
-        Vector3 rayPosition = transform.position + new Vector3(0.0f, 0.8f, 0.0f);
+        Vector3 rayPosition = transform.position + new Vector3(0.0f, 0.6f, 0.0f);
         RaycastHit hitinfo;
         Ray ray = new Ray(rayPosition, Vector3.down);
         bool isGround = Physics.Raycast(ray, out hitinfo);
@@ -34,6 +34,11 @@ public class Player : MonoBehaviour
 
         //isGrounded = Physics.Raycast(gameObject.transform.position + 0.1f * gameObject.transform.up, -gameObject.transform.up, 0.15f);
         //Debug.DrawRay(gameObject.transform.position + 0.1f * gameObject.transform.up, -0.15f * gameObject.transform.up, Color.blue);
+
+        /*if (jumpDirection.y > 0)
+        {
+            jumpDirection.y -= 1 * Time.deltaTime;
+        }*/
 
         if (Input.GetKey(KeyCode.UpArrow))
         {
@@ -51,12 +56,22 @@ public class Player : MonoBehaviour
         {
             moveDirection.x = -1;
         }
-        if (Input.GetKeyDown(KeyCode.Space) && isGround==true)
+
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            //rb.AddForce(new Vector3(0, 300, 0));
-            jumpDirection = Vector3.up;
-            PlayerAnimator.SetTrigger("JUMP");
+            jumpDirection.y = jump * Time.deltaTime;
+            PlayerAnimator.SetBool("JUMP", true);
         }
+        else
+        {
+            
+            PlayerAnimator.SetBool("JUMP", false);
+        }
+
+        /*if (isGround == false)
+        {
+            jumpDirection.y -= 1 * Time.deltaTime;
+        }*/
 
         moveDirection.Normalize();//ê≥ãKâª
         jumpDirection.Normalize();
@@ -74,7 +89,9 @@ public class Player : MonoBehaviour
         }
 
         moveDirection *= speed * Time.deltaTime;
+        jumpDirection *= jump * Time.deltaTime;
         transform.position += moveDirection;
+        transform.position += jumpDirection;
         Debug.Log(isGround);
     }
 }
