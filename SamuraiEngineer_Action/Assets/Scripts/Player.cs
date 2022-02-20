@@ -2,19 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class Player : MonoBehaviour
 {
     public float speed = 5.0f;
-    public float jump = 10.0f;
+    protected float jump = 5.0f;
     Animator PlayerAnimator;
-    private float distance = 0.1f;
-    protected float gravity = 1.0f;
-    //private bool isGrounded = false;
+    private float distance = 0.7f;
+    protected float gravity = 9.8f;
+    protected float gravityAcceleration = 0.0f;
+    protected bool isGround = false;
+    protected enum STATE
+    {
+        WAIT,
+        RUN,
+        JUMP
+    }
+
+    protected STATE myState;
+
+
     // Start is called before the first frame update
     void Start()
     {
         //rb.constraints = RigidbodyConstraints.FreezeRotation;
         PlayerAnimator = GetComponent<Animator>();
+        myState = STATE.WAIT;
     }
 
     // Update is called once per frame
@@ -26,9 +39,9 @@ public class Player : MonoBehaviour
         Vector3 rayPosition = transform.position + new Vector3(0.0f, 0.6f, 0.0f);
         RaycastHit hitinfo;
         Ray ray = new Ray(rayPosition, Vector3.down);
-        bool isGround = Physics.Raycast(ray, out hitinfo);
-        distance = hitinfo.distance;
-        transform.position = hitinfo.point;//接地している間はYのみ。
+        Physics.Raycast(ray, out hitinfo);
+
+        //transform.position = hitinfo.point;//接地している間はYのみ。
         Debug.DrawRay(rayPosition, Vector3.down * distance, Color.red);
         //Vector3 forwardDirection = transform.forward;
 
@@ -57,24 +70,39 @@ public class Player : MonoBehaviour
             moveDirection.x = -1;
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            jumpDirection.y = jump * Time.deltaTime;
-            PlayerAnimator.SetBool("JUMP", true);
-        }
-        else
-        {
-            
-            PlayerAnimator.SetBool("JUMP", false);
-        }
+        
 
         /*if (isGround == false)
         {
             jumpDirection.y -= 1 * Time.deltaTime;
         }*/
 
+        if (hitinfo.distance < distance)
+        {
+            gravityAcceleration = 0;
+            isGround = true;
+            PlayerAnimator.SetBool("JUMP", false);
+            myState = STATE.WAIT;
+        }
+        else
+        {
+            gravityAcceleration += gravity * Time.deltaTime;
+            isGround = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space) && isGround)
+        {
+            myState = STATE.JUMP;
+            isGround = false;
+            PlayerAnimator.SetBool("JUMP", true);
+        }
+
+        if (myState == STATE.JUMP)
+        {
+            jumpDirection.y = jump;
+        }
+
         moveDirection.Normalize();//正規化
-        jumpDirection.Normalize();
 
         //Vector3 rotateDirecton = transform.position - PlayerPos;
 
@@ -89,9 +117,15 @@ public class Player : MonoBehaviour
         }
 
         moveDirection *= speed * Time.deltaTime;
-        jumpDirection *= jump * Time.deltaTime;
+        jumpDirection.y -= gravityAcceleration;
         transform.position += moveDirection;
-        transform.position += jumpDirection;
+        transform.position += jumpDirection * Time.deltaTime;
+        if (isGround)
+        {
+            Vector3 Baseposition = transform.position;//まず全てをコピー
+            Baseposition.y = hitinfo.point.y;//上からyだけを抽出
+            transform.position = Baseposition;
+        }
         Debug.Log(isGround);
     }
 }
