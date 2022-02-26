@@ -6,12 +6,17 @@ using UnityEngine;
 public class Player : MonoBehaviour
 {
     public float speed = 5.0f;
-    protected float jump = 5.0f;
+    protected float jump = 7.5f;
     Animator PlayerAnimator;
     private float distance = 0.7f;
     protected float gravity = 9.8f;
     protected float gravityAcceleration = 0.0f;
     protected bool isGround = false;
+    protected bool isWallLeft = true;
+    protected bool isWallRight = true;
+    protected bool isWallBack = true;
+    protected bool isWallFront = true;
+
     protected enum STATE
     {
         WAIT,
@@ -36,13 +41,29 @@ public class Player : MonoBehaviour
         Vector3 moveDirection = new Vector3(0, 0, 0);
         Vector3 jumpDirection = new Vector3(0, 0, 0);
 
-        Vector3 rayPosition = transform.position + new Vector3(0.0f, 0.6f, 0.0f);
-        RaycastHit hitinfo;
+        Vector3 rayPosition = transform.position + new Vector3(0.0f, 0.7f, 0.0f);
+        RaycastHit hitinfo, hitLeft, hitRight, hitBack, hitFront;
         Ray ray = new Ray(rayPosition, Vector3.down);
         Physics.Raycast(ray, out hitinfo);
+        
+        Ray ray2 = new Ray(rayPosition, Vector3.left);
+        Physics.Raycast(ray2, out hitLeft);
+        
+        Ray ray3 = new Ray(rayPosition, Vector3.right);
+        Physics.Raycast(ray3, out hitRight);
+        
+        Ray ray4 = new Ray(rayPosition, Vector3.back);
+        Physics.Raycast(ray4, out hitBack);
+        
+        Ray ray5 = new Ray(rayPosition, Vector3.forward);
+        Physics.Raycast(ray5, out hitFront);
 
         //transform.position = hitinfo.point;//接地している間はYのみ。
-        Debug.DrawRay(rayPosition, Vector3.down * distance, Color.red);
+        Debug.DrawRay(rayPosition, Vector3.down * distance, Color.green);
+        Debug.DrawRay(rayPosition, Vector3.left * distance, Color.red);//左
+        Debug.DrawRay(rayPosition, Vector3.right * distance, Color.yellow);//右
+        Debug.DrawRay(rayPosition, Vector3.back * distance, Color.blue);//前
+        Debug.DrawRay(rayPosition, Vector3.forward * distance, Color.cyan);//奥
         //Vector3 forwardDirection = transform.forward;
 
         //isGrounded = Physics.Raycast(gameObject.transform.position + 0.1f * gameObject.transform.up, -gameObject.transform.up, 0.15f);
@@ -53,19 +74,19 @@ public class Player : MonoBehaviour
             jumpDirection.y -= 1 * Time.deltaTime;
         }*/
 
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.UpArrow) && isWallFront)
         {
             moveDirection.z = 1;
         }
-        if (Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.DownArrow) && isWallBack)
         {
             moveDirection.z = -1;
         }
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow) && isWallRight)
         {
             moveDirection.x = 1;
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow) && isWallLeft)
         {
             moveDirection.x = -1;
         }
@@ -88,6 +109,46 @@ public class Player : MonoBehaviour
         {
             gravityAcceleration += gravity * Time.deltaTime;
             isGround = false;
+        }
+
+        if(Physics.Raycast(ray2, out hitLeft, distance))
+        {
+            isWallLeft = false;
+            Debug.Log("LeftHit");
+        }
+        else
+        {
+            isWallLeft = true;
+        }
+
+        if (Physics.Raycast(ray3, out hitRight, distance))
+        {
+            isWallRight = false;
+            Debug.Log("RightHit");
+        }
+        else
+        {
+            isWallRight = true;
+        }
+
+        if (Physics.Raycast(ray4, out hitBack, distance))
+        {
+            isWallBack = false;
+            Debug.Log("BackHit");
+        }
+        else
+        {
+            isWallBack = true;
+        }
+
+        if (Physics.Raycast(ray5, out hitFront, distance))
+        {
+            isWallFront = false;
+            Debug.Log("FrontHit");
+        }
+        else
+        {
+            isWallFront = true;
         }
 
         if (Input.GetKeyDown(KeyCode.Space) && isGround)
@@ -126,6 +187,6 @@ public class Player : MonoBehaviour
             Baseposition.y = hitinfo.point.y;//上からyだけを抽出
             transform.position = Baseposition;
         }
-        Debug.Log(isGround);
+        //Debug.Log(isGround);
     }
 }
