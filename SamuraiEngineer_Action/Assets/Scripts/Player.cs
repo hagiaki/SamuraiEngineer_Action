@@ -12,10 +12,6 @@ public class Player : MonoBehaviour
     protected float gravity = 9.8f;
     protected float gravityAcceleration = 0.0f;
     protected bool isGround = false;
-    protected bool isWallLeft = true;
-    protected bool isWallRight = true;
-    protected bool isWallBack = true;
-    protected bool isWallFront = true;
 
     protected enum STATE
     {
@@ -38,66 +34,79 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Vector3 moveDirection = new Vector3(0, 0, 0);
+        Vector3 moveDirection = GetMoveInput();
         Vector3 jumpDirection = new Vector3(0, 0, 0);
 
         Vector3 rayPosition = transform.position + new Vector3(0.0f, 0.7f, 0.0f);
-        RaycastHit hitinfo, hitLeft, hitRight, hitBack, hitFront;
+        RaycastHit hitinfo;
         Ray ray = new Ray(rayPosition, Vector3.down);
         Physics.Raycast(ray, out hitinfo);
-        
-        Ray ray2 = new Ray(rayPosition, Vector3.left);
-        Physics.Raycast(ray2, out hitLeft);
-        
-        Ray ray3 = new Ray(rayPosition, Vector3.right);
-        Physics.Raycast(ray3, out hitRight);
-        
-        Ray ray4 = new Ray(rayPosition, Vector3.back);
-        Physics.Raycast(ray4, out hitBack);
-        
-        Ray ray5 = new Ray(rayPosition, Vector3.forward);
-        Physics.Raycast(ray5, out hitFront);
 
         //transform.position = hitinfo.point;//接地している間はYのみ。
         Debug.DrawRay(rayPosition, Vector3.down * distance, Color.green);
-        Debug.DrawRay(rayPosition, Vector3.left * distance, Color.red);//左
-        Debug.DrawRay(rayPosition, Vector3.right * distance, Color.yellow);//右
-        Debug.DrawRay(rayPosition, Vector3.back * distance, Color.blue);//前
-        Debug.DrawRay(rayPosition, Vector3.forward * distance, Color.cyan);//奥
-        //Vector3 forwardDirection = transform.forward;
 
-        //isGrounded = Physics.Raycast(gameObject.transform.position + 0.1f * gameObject.transform.up, -gameObject.transform.up, 0.15f);
-        //Debug.DrawRay(gameObject.transform.position + 0.1f * gameObject.transform.up, -0.15f * gameObject.transform.up, Color.blue);
+        CheckGroundLanding(ref hitinfo);
 
-        /*if (jumpDirection.y > 0)
+        ChangeJump();
+
+        if (myState == STATE.JUMP)
         {
-            jumpDirection.y -= 1 * Time.deltaTime;
-        }*/
+            jumpDirection.y = jump;
+        }
 
-        if (Input.GetKey(KeyCode.UpArrow) && isWallFront)
+        moveDirection.Normalize();//正規化
+
+        //Vector3 rotateDirecton = transform.position - PlayerPos;
+
+        CheckRunning(moveDirection);
+
+        //hitinfo.normal
+
+        moveDirection *= speed * Time.deltaTime;
+        jumpDirection.y -= gravityAcceleration;
+        transform.position += moveDirection;
+        transform.position += jumpDirection * Time.deltaTime;
+        
+        LandingFixedPositionY(ref hitinfo);
+        //Debug.Log(isGround);
+    }
+
+    Vector3 GetMoveInput()
+    {
+        Vector3 moveDirection = new Vector3(0, 0, 0);
+
+        if (Input.GetKey(KeyCode.UpArrow))
         {
             moveDirection.z = 1;
         }
-        if (Input.GetKey(KeyCode.DownArrow) && isWallBack)
+        if (Input.GetKey(KeyCode.DownArrow))
         {
             moveDirection.z = -1;
         }
-        if (Input.GetKey(KeyCode.RightArrow) && isWallRight)
+        if (Input.GetKey(KeyCode.RightArrow))
         {
             moveDirection.x = 1;
         }
-        if (Input.GetKey(KeyCode.LeftArrow) && isWallLeft)
+        if (Input.GetKey(KeyCode.LeftArrow))
         {
             moveDirection.x = -1;
         }
+        return moveDirection;
+    }
 
-        
+    void ChangeJump()
+    {
 
-        /*if (isGround == false)
+        if (Input.GetKeyDown(KeyCode.Space) && isGround)
         {
-            jumpDirection.y -= 1 * Time.deltaTime;
-        }*/
+            myState = STATE.JUMP;
+            isGround = false;
+            PlayerAnimator.SetBool("JUMP", true);
+        }
+    }
 
+    void CheckGroundLanding(ref RaycastHit hitinfo)
+    {
         if (hitinfo.distance < distance)
         {
             gravityAcceleration = 0;
@@ -110,62 +119,10 @@ public class Player : MonoBehaviour
             gravityAcceleration += gravity * Time.deltaTime;
             isGround = false;
         }
+    }
 
-        if(Physics.Raycast(ray2, out hitLeft, distance))
-        {
-            isWallLeft = false;
-            Debug.Log("LeftHit");
-        }
-        else
-        {
-            isWallLeft = true;
-        }
-
-        if (Physics.Raycast(ray3, out hitRight, distance))
-        {
-            isWallRight = false;
-            Debug.Log("RightHit");
-        }
-        else
-        {
-            isWallRight = true;
-        }
-
-        if (Physics.Raycast(ray4, out hitBack, distance))
-        {
-            isWallBack = false;
-            Debug.Log("BackHit");
-        }
-        else
-        {
-            isWallBack = true;
-        }
-
-        if (Physics.Raycast(ray5, out hitFront, distance))
-        {
-            isWallFront = false;
-            Debug.Log("FrontHit");
-        }
-        else
-        {
-            isWallFront = true;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Space) && isGround)
-        {
-            myState = STATE.JUMP;
-            isGround = false;
-            PlayerAnimator.SetBool("JUMP", true);
-        }
-
-        if (myState == STATE.JUMP)
-        {
-            jumpDirection.y = jump;
-        }
-
-        moveDirection.Normalize();//正規化
-
-        //Vector3 rotateDirecton = transform.position - PlayerPos;
+    void CheckRunning(Vector3 moveDirection)
+    {
 
         if (moveDirection.magnitude > 0.01f)
         {
@@ -176,17 +133,15 @@ public class Player : MonoBehaviour
         {
             PlayerAnimator.SetBool("RUNNING", false);
         }
+    }
 
-        moveDirection *= speed * Time.deltaTime;
-        jumpDirection.y -= gravityAcceleration;
-        transform.position += moveDirection;
-        transform.position += jumpDirection * Time.deltaTime;
+    void LandingFixedPositionY(ref RaycastHit hitinfo)
+    {
         if (isGround)
         {
             Vector3 Baseposition = transform.position;//まず全てをコピー
             Baseposition.y = hitinfo.point.y;//上からyだけを抽出
             transform.position = Baseposition;
         }
-        //Debug.Log(isGround);
     }
 }
