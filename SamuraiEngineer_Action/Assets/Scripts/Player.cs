@@ -12,6 +12,7 @@ public class Player : MonoBehaviour
     protected float gravity = 9.8f;
     protected float gravityAcceleration = 0.0f;
     protected bool isGround = false;
+    protected bool isWall = true;
 
     protected enum STATE
     {
@@ -36,16 +37,21 @@ public class Player : MonoBehaviour
     {
         Vector3 moveDirection = GetMoveInput();
         Vector3 jumpDirection = new Vector3(0, 0, 0);
+        var direction = transform.forward;
 
         Vector3 rayPosition = transform.position + new Vector3(0.0f, 0.7f, 0.0f);
-        RaycastHit hitinfo;
+        RaycastHit hitinfo, hitinfoFront;
         Ray ray = new Ray(rayPosition, Vector3.down);
         Physics.Raycast(ray, out hitinfo);
+        Ray frontray = new Ray(rayPosition, direction);
+        Physics.Raycast(frontray, out hitinfoFront);
 
         //transform.position = hitinfo.point;//接地している間はYのみ。
         Debug.DrawRay(rayPosition, Vector3.down * distance, Color.green);
+        Debug.DrawRay(rayPosition, direction * distance, Color.red);
 
         CheckGroundLanding(ref hitinfo);
+        CheckWallLanding(frontray, ref hitinfoFront);
 
         ChangeJump();
 
@@ -68,33 +74,33 @@ public class Player : MonoBehaviour
         transform.position += jumpDirection * Time.deltaTime;
         
         LandingFixedPositionY(ref hitinfo);
-        //Debug.Log(isGround);
+        Debug.Log(isWall);
     }
 
     Vector3 GetMoveInput()
     {
         Vector3 moveDirection = new Vector3(0, 0, 0);
 
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.UpArrow) && isWall)
         {
             moveDirection.z = 1;
         }
-        if (Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.DownArrow) && isWall)
         {
             moveDirection.z = -1;
         }
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow) && isWall)
         {
             moveDirection.x = 1;
         }
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow) && isWall)
         {
             moveDirection.x = -1;
         }
         return moveDirection;
     }
 
-    void ChangeJump()
+    void ChangeJump()//ジャンプ
     {
 
         if (Input.GetKeyDown(KeyCode.Space) && isGround)
@@ -105,7 +111,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    void CheckGroundLanding(ref RaycastHit hitinfo)
+    void CheckGroundLanding(ref RaycastHit hitinfo)//重力判定
     {
         if (hitinfo.distance < distance)
         {
@@ -121,7 +127,19 @@ public class Player : MonoBehaviour
         }
     }
 
-    void CheckRunning(Vector3 moveDirection)
+    void CheckWallLanding(Ray frontray,ref RaycastHit hitinfoFront)//壁判定
+    {
+        if (Physics.Raycast(frontray, out hitinfoFront))
+        {
+            isWall = false;
+        }
+        else
+        {
+            isWall = true;
+        }
+    }
+
+    void CheckRunning(Vector3 moveDirection)//ダッシュ・方向切替判定
     {
 
         if (moveDirection.magnitude > 0.01f)
