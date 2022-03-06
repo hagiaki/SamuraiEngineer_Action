@@ -37,14 +37,14 @@ public class Player : MonoBehaviour
     {
         Vector3 moveDirection = GetMoveInput();
         Vector3 jumpDirection = new Vector3(0, 0, 0);
-        var direction = transform.forward;
+        var direction = transform.forward * 1.0f;
 
         Vector3 rayPosition = transform.position + new Vector3(0.0f, 0.7f, 0.0f);
         RaycastHit hitinfo, hitinfoFront;
+        hitinfoFront = new RaycastHit();
         Ray ray = new Ray(rayPosition, Vector3.down);
         Physics.Raycast(ray, out hitinfo);
-        Ray frontray = new Ray(rayPosition, direction);
-        Physics.Raycast(frontray, out hitinfoFront);
+        Ray frontray = new Ray(rayPosition, direction);//進行方向
 
         //transform.position = hitinfo.point;//接地している間はYのみ。
         Debug.DrawRay(rayPosition, Vector3.down * distance, Color.green);
@@ -71,29 +71,36 @@ public class Player : MonoBehaviour
         moveDirection *= speed * Time.deltaTime;
         jumpDirection.y -= gravityAcceleration;
         transform.position += moveDirection;
-        transform.position += jumpDirection * Time.deltaTime;
-        
+        if (!isGround)
+        {
+            transform.position += jumpDirection * Time.deltaTime;
+        }
+
         LandingFixedPositionY(ref hitinfo);
-        Debug.Log(isWall);
+
+        Vector3 result = Quaternion.Euler(0, 90, 0) * hitinfoFront.normal;
+        Vector3 hitvec = hitinfoFront.point - transform.position;
+        Vector3 wallvec = moveDirection + hitinfoFront.normal;
+
     }
 
     Vector3 GetMoveInput()
     {
         Vector3 moveDirection = new Vector3(0, 0, 0);
 
-        if (Input.GetKey(KeyCode.UpArrow) && isWall)
+        if (Input.GetKey(KeyCode.UpArrow))
         {
             moveDirection.z = 1;
         }
-        if (Input.GetKey(KeyCode.DownArrow) && isWall)
+        if (Input.GetKey(KeyCode.DownArrow))
         {
             moveDirection.z = -1;
         }
-        if (Input.GetKey(KeyCode.RightArrow) && isWall)
+        if (Input.GetKey(KeyCode.RightArrow))
         {
             moveDirection.x = 1;
         }
-        if (Input.GetKey(KeyCode.LeftArrow) && isWall)
+        if (Input.GetKey(KeyCode.LeftArrow))
         {
             moveDirection.x = -1;
         }
@@ -129,7 +136,7 @@ public class Player : MonoBehaviour
 
     void CheckWallLanding(Ray frontray,ref RaycastHit hitinfoFront)//壁判定
     {
-        if (Physics.Raycast(frontray, out hitinfoFront))
+        if (Physics.Raycast(frontray, out hitinfoFront,1.0f))
         {
             isWall = false;
         }

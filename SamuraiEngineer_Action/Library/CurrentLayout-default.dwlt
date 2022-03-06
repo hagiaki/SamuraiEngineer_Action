@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1280
     height: 637.3334
   m_ShowMode: 4
-  m_Title: Hierarchy
+  m_Title: Game
   m_RootView: {fileID: 2}
   m_MinSize: {x: 875, y: 492}
   m_MaxSize: {x: 10000, y: 10000}
@@ -103,7 +103,7 @@ MonoBehaviour:
   m_MinSize: {x: 908, y: 442}
   m_MaxSize: {x: 22003, y: 10021}
   vertical: 0
-  controlID: 109
+  controlID: 37
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -370,8 +370,8 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: 
-      m_LastClickedID: 0
+      m_SelectedIDs: 583a0000
+      m_LastClickedID: 14936
       m_ExpandedIDs: 52fbffff
       m_RenameOverlay:
         m_UserAcceptedRename: 0
@@ -471,21 +471,21 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Scripts
+    - Assets/Scenes
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Scripts
+  - Assets/Scenes
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Users\1923170\Documents\SamuraiEngineer_Action\SamuraiEngineer_Action
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
     scrollPos: {x: 0, y: 0}
-    m_SelectedIDs: e6400000
-    m_LastClickedID: 16614
+    m_SelectedIDs: e4400000
+    m_LastClickedID: 16612
     m_ExpandedIDs: 00000000b2400000b4400000b6400000b8400000ba40000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -541,7 +541,7 @@ MonoBehaviour:
   m_ListAreaState:
     m_SelectedInstanceIDs: 
     m_LastClickedInstanceID: 0
-    m_HadKeyboardFocusLastEvent: 1
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: aa430000c8430000544400001a4200003a6c0000b6790000d27e0000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -695,9 +695,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: -0.013578389, y: 1.4439052, z: 0.70187885}
+    m_Target: {x: 0.9052623, y: 0.9548501, z: -0.93306124}
     speed: 2
-    m_Value: {x: -0.013578389, y: 1.4439052, z: 0.70187885}
+    m_Value: {x: 0.9052623, y: 0.9548501, z: -0.93306124}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -744,13 +744,13 @@ MonoBehaviour:
     m_GridAxis: 1
     m_gridOpacity: 0.5
   m_Rotation:
-    m_Target: {x: 0.11356302, y: -0.3363837, z: 0.040904284, w: 0.9339637}
+    m_Target: {x: 0.26670277, y: 0.014741884, z: -0.0040778113, w: 0.9636693}
     speed: 2
-    m_Value: {x: 0.113562346, y: -0.3363817, z: 0.04090404, w: 0.9339582}
+    m_Value: {x: 0.26669973, y: 0.014741715, z: -0.0040777647, w: 0.9636583}
   m_Size:
-    m_Target: 2.7116234
+    m_Target: 0.61162364
     speed: 2
-    m_Value: 2.7116234
+    m_Value: 0.61162364
   m_Ortho:
     m_Target: 0
     speed: 2
