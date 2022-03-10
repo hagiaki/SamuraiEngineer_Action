@@ -5,16 +5,16 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public float speed = 5.0f;
-    protected float jump = 7.5f;
-    Animator PlayerAnimator;
-    private float distance = 0.7f;
-    protected float gravity = 9.8f;
-    protected float gravityAcceleration = 0.0f;
-    protected bool isGround = false;
-    protected bool isWall = true;
+    public float speed = 5.0f;//移動速度
+    protected float jump = 7.5f;//ジャンプ速度
+    Animator PlayerAnimator;//アニメーション
+    private float distance = 0.7f;//raycastの長さ
+    protected float gravity = 9.8f;//重力
+    protected float gravityAcceleration = 0.0f;//重力加速度
+    protected bool isGround = false;//地面判定
+    protected bool isWall = true;//壁判定
 
-    protected enum STATE
+    protected enum STATE//キャラクターの状態
     {
         WAIT,
         RUN,
@@ -46,12 +46,20 @@ public class Player : MonoBehaviour
         Physics.Raycast(ray, out hitinfo);
         Ray frontray = new Ray(rayPosition, direction);//進行方向
 
-        //transform.position = hitinfo.point;//接地している間はYのみ。
         Debug.DrawRay(rayPosition, Vector3.down * distance, Color.green);
         Debug.DrawRay(rayPosition, direction * distance, Color.red);
-
+        
+        Vector3 result = Quaternion.Euler(0, 90, 0) * hitinfoFront.normal;
+        Vector3 hitvec = hitinfoFront.point - transform.position;
+        Vector3 wallvec = moveDirection + hitvec * distance;
+        
         CheckGroundLanding(ref hitinfo);
         CheckWallLanding(frontray, ref hitinfoFront);
+
+        if (!isWall)
+        {
+            moveDirection = wallvec;
+        }
 
         ChangeJump();
 
@@ -61,12 +69,7 @@ public class Player : MonoBehaviour
         }
 
         moveDirection.Normalize();//正規化
-
-        //Vector3 rotateDirecton = transform.position - PlayerPos;
-
         CheckRunning(moveDirection);
-
-        //hitinfo.normal
 
         moveDirection *= speed * Time.deltaTime;
         jumpDirection.y -= gravityAcceleration;
@@ -77,10 +80,7 @@ public class Player : MonoBehaviour
         }
 
         LandingFixedPositionY(ref hitinfo);
-
-        Vector3 result = Quaternion.Euler(0, 90, 0) * hitinfoFront.normal;
-        Vector3 hitvec = hitinfoFront.point - transform.position;
-        Vector3 wallvec = moveDirection + hitinfoFront.normal;
+        Debug.Log(isWall);
 
     }
 
