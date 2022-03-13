@@ -37,8 +37,9 @@ public class Player : MonoBehaviour
     {
         Vector3 moveDirection = GetMoveInput();
         Vector3 jumpDirection = new Vector3(0, 0, 0);
+        Vector3 CalcMoveDirection = moveDirection * speed * Time.deltaTime;
         var direction = transform.forward * 1.0f;
-
+        
         Vector3 rayPosition = transform.position + new Vector3(0.0f, 0.7f, 0.0f);
         RaycastHit hitinfo, hitinfoFront;
         hitinfoFront = new RaycastHit();
@@ -49,17 +50,14 @@ public class Player : MonoBehaviour
         Debug.DrawRay(rayPosition, Vector3.down * distance, Color.green);
         Debug.DrawRay(rayPosition, direction * distance, Color.red);
         
-        Vector3 result = Quaternion.Euler(0, 90, 0) * hitinfoFront.normal;
-        Vector3 hitvec = hitinfoFront.point - transform.position;
-        Vector3 wallvec = moveDirection + hitvec * distance;
-        
         CheckGroundLanding(ref hitinfo);
-        CheckWallLanding(frontray, ref hitinfoFront);
+        CheckWallLanding(frontray, ref hitinfoFront, speed * Time.deltaTime);
 
-        if (!isWall)
-        {
-            moveDirection = wallvec;
-        }
+        Vector3 AlongWallVec = CalcMoveDirection + hitinfoFront.normal;
+        AlongWallVec.Normalize();
+        float AlongWallDot = Vector3.Dot(AlongWallVec, CalcMoveDirection);
+        AlongWallVec *= AlongWallDot;
+
 
         ChangeJump();
 
@@ -72,6 +70,14 @@ public class Player : MonoBehaviour
         CheckRunning(moveDirection);
 
         moveDirection *= speed * Time.deltaTime;
+
+        if (!isWall)
+        {
+            moveDirection = AlongWallVec;
+            Debug.Log(AlongWallDot);
+            Debug.Log(AlongWallVec);
+        }
+
         jumpDirection.y -= gravityAcceleration;
         transform.position += moveDirection;
         if (!isGround)
@@ -134,9 +140,9 @@ public class Player : MonoBehaviour
         }
     }
 
-    void CheckWallLanding(Ray frontray,ref RaycastHit hitinfoFront)//•Ç”»’è
+    void CheckWallLanding(Ray frontray,ref RaycastHit hitinfoFront,float maxDistance)//•Ç”»’è
     {
-        if (Physics.Raycast(frontray, out hitinfoFront,1.0f))
+        if (Physics.Raycast(frontray, out hitinfoFront,maxDistance))
         {
             isWall = false;
         }
