@@ -86,7 +86,7 @@ public class Player : MonoBehaviour
         }
 
         LandingFixedPositionY(ref hitinfo);
-        Debug.Log(isWall);
+        //Debug.Log(isWall);
 
     }
 
