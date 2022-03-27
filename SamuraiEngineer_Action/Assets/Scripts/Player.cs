@@ -14,6 +14,8 @@ public class Player : MonoBehaviour
     protected bool isGround = false;//地面判定
     protected bool isWall = true;//壁判定
 
+    const float charaDistance=0.2f;//後から変更されない
+
     protected enum STATE//キャラクターの状態
     {
         WAIT,
@@ -42,23 +44,16 @@ public class Player : MonoBehaviour
         
         Vector3 rayPosition = transform.position + new Vector3(0.0f, 0.7f, 0.0f);
         RaycastHit hitinfo, hitinfoFront;
-        hitinfoFront = new RaycastHit();
         Ray ray = new Ray(rayPosition, Vector3.down);
         Physics.Raycast(ray, out hitinfo);
-        Ray frontray = new Ray(rayPosition, direction);//進行方向
+        Ray frontray = new Ray(rayPosition, CalcMoveDirection);//進行方向
 
         Debug.DrawRay(rayPosition, Vector3.down * distance, Color.green);
         Debug.DrawRay(rayPosition, direction * distance, Color.red);
         
-        CheckGroundLanding(ref hitinfo);
-        CheckWallLanding(frontray, ref hitinfoFront, speed * Time.deltaTime);
-
-        Vector3 AlongWallVec = CalcMoveDirection + hitinfoFront.normal;
-        AlongWallVec.Normalize();
-        float AlongWallDot = Vector3.Dot(AlongWallVec, CalcMoveDirection);
-        AlongWallVec *= AlongWallDot;
-
-
+        CheckGroundLanding(hitinfo);//床判定
+        hitinfoFront = CheckWallLanding(frontray);
+        Vector3 AlongWallVec = CalcMoveDirection - Vector3.Dot(CalcMoveDirection, hitinfoFront.normal.normalized) * hitinfoFront.normal.normalized;
         ChangeJump();
 
         if (myState == STATE.JUMP)
@@ -71,10 +66,9 @@ public class Player : MonoBehaviour
 
         moveDirection *= speed * Time.deltaTime;
 
-        if (!isWall)
+        if (isWall)
         {
             moveDirection = AlongWallVec;
-            Debug.Log(AlongWallDot);
             Debug.Log(AlongWallVec);
         }
 
@@ -85,7 +79,7 @@ public class Player : MonoBehaviour
             transform.position += jumpDirection * Time.deltaTime;
         }
 
-        LandingFixedPositionY(ref hitinfo);
+        LandingFixedPositionY(hitinfo);
         //Debug.Log(isWall);
 
     }
@@ -124,7 +118,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    void CheckGroundLanding(ref RaycastHit hitinfo)//重力判定
+    void CheckGroundLanding(RaycastHit hitinfo)//重力判定
     {
         if (hitinfo.distance < distance)
         {
@@ -140,16 +134,20 @@ public class Player : MonoBehaviour
         }
     }
 
-    void CheckWallLanding(Ray frontray,ref RaycastHit hitinfoFront,float maxDistance)//壁判定
+    RaycastHit CheckWallLanding(Ray frontray)//壁判定
     {
-        if (Physics.Raycast(frontray, out hitinfoFront,maxDistance))
+        RaycastHit raycastHit;
+        int StageLayer = 1 << 7;
+        isWall = false;
+
+        if (Physics.Raycast(frontray, out raycastHit, 100, StageLayer)) 
         {
-            isWall = false;
+            if (raycastHit.distance < charaDistance)
+            {
+                isWall = true;
+            }
         }
-        else
-        {
-            isWall = true;
-        }
+        return raycastHit;
     }
 
     void CheckRunning(Vector3 moveDirection)//ダッシュ・方向切替判定
@@ -166,7 +164,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    void LandingFixedPositionY(ref RaycastHit hitinfo)
+    void LandingFixedPositionY(RaycastHit hitinfo)
     {
         if (isGround)
         {
