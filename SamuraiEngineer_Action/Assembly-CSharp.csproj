@@ -53,23 +53,26 @@
     <UnityVersion>2020.3.4f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\Result.cs" />
     <Compile Include="Assets\Resources\Unity-chan! Model\Scripts\CameraController.cs" />
     <Compile Include="Assets\Scripts\Title.cs" />
     <Compile Include="Assets\Resources\Unity-chan! Model\Scripts\UnityChanControlScriptWithRgidBody.cs" />
     <Compile Include="Assets\Resources\Unity-chan! Model\Scripts\SpringCollider.cs" />
     <Compile Include="Assets\Scripts\Goal.cs" />
     <Compile Include="Assets\Scripts\Player.cs" />
+    <Compile Include="Assets\Scripts\EventManager.cs" />
     <Compile Include="Assets\Resources\Unity-chan! Model\Scripts\FaceUpdate.cs" />
     <Compile Include="Assets\Resources\Unity-chan! Model\SplashScreen\Scripts\SplashScreen.cs" />
     <Compile Include="Assets\Resources\Unity-chan! Model\Scripts\SpringManager.cs" />
     <Compile Include="Assets\Resources\Unity-chan! Model\Scripts\RandomWind.cs" />
     <Compile Include="Assets\Scripts\PlayerTest.cs" />
     <Compile Include="Assets\Resources\Unity-chan! Model\Scripts\IKCtrlRightHand.cs" />
+    <Compile Include="Assets\Scripts\Event.cs" />
     <Compile Include="Assets\Resources\Unity-chan! Model\Scripts\IdleChanger.cs" />
     <Compile Include="Assets\Resources\Unity-chan! Model\Scripts\ThirdPersonCamera.cs" />
     <Compile Include="Assets\Resources\Unity-chan! Model\Scripts\SpringBone.cs" />
     <Compile Include="Assets\Resources\Unity-chan! Model\Scripts\AutoBlink.cs" />
-    <Compile Include="Assets\Scripts\Result.cs" />
+    <Compile Include="Assets\Scripts\SingletonMonoBehaviour.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Resources\Unity-chan! Model\Art\UnityChanShader\Shader\Unitychan_chara_fuku.shader" />

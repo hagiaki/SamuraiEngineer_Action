@@ -15,7 +15,7 @@ public class Goal : MonoBehaviour
 
     void Update()
     {
-        Debug.Log(goal);
+        //Debug.Log(goal);
         if (goal)
         {
             SceneManager.LoadScene("Result");

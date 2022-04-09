@@ -69,7 +69,7 @@ public class Player : MonoBehaviour
         if (isWall)
         {
             moveDirection = AlongWallVec;
-            Debug.Log(AlongWallVec);
+            //Debug.Log(AlongWallVec);
         }
 
         jumpDirection.y -= gravityAcceleration;
