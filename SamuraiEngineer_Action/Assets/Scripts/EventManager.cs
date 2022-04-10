@@ -12,13 +12,7 @@ public class EventManager: MonoBehaviour
 
     private void Start()
     {
-        csvFile = Resources.Load("EventData/Event_01") as TextAsset;
-        StringReader reader = new StringReader(csvFile.text);
-        while (reader.Peek() != -1)
-        {
-            String line = reader.ReadLine();
-            csvDatas.Add(line.Split(','));
-        }
+        
     }
 
     private void Awake()
@@ -34,9 +28,30 @@ public class EventManager: MonoBehaviour
         }
     }
 
-    public void subroutine()
+    private void CsvLoad(int EventID)
     {
+        csvDatas.Clear();
+        string EventID_S = String.Format("{0:D2}", EventID);//D2ÇÕ2ÉPÉ^
+        csvFile = Resources.Load("EventData/Event_" + EventID_S) as TextAsset;
+        StringReader reader = new StringReader(csvFile.text);
+        while (reader.Peek() != -1)
+        {
+            String line = reader.ReadLine();
+            csvDatas.Add(line.Split(','));
+        }
+    }
+
+    public List<String[]> subroutine(int EventID)
+    {
+        if (EventID == 0)
+        {
+            Debug.Log("IDÇ™ê›íËÇ≥ÇÍÇƒÇ¢Ç‹ÇπÇÒ");
+            return null;
+        }
+        CsvLoad(EventID);
         Debug.Log(csvDatas[0][0]);
+
+        return csvDatas;
     }
 
     /*private static EventManager eventManager = new EventManager();
